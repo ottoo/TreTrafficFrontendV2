@@ -3,7 +3,11 @@ import { observer, inject } from "mobx-react";
 import * as R from "ramda";
 
 import MapBoxGLMap from "./components/MapBoxGLMap/MapBoxGLMap";
-import style from "./components/MapBoxGLMap/style.json";
+
+const importMapStyle = () =>
+  process.env.NODE_ENV === "production"
+    ? require("./components/MapBoxGLMap/style_prod.json")
+    : require("./components/MapBoxGLMap/style_dev.json");
 
 class App extends Component {
   componentDidMount() {
@@ -27,7 +31,7 @@ class App extends Component {
           mapOptions={{
             container: "map",
             center: [23.7610254, 61.4981509],
-            style,
+            style: importMapStyle(),
             zoom: 12
           }}
           markers={this.props.store.markers.toJS()}
