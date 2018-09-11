@@ -5,8 +5,6 @@ import * as R from "ramda";
 import MapBoxGLMap from "./components/MapBoxGLMap/MapBoxGLMap";
 import style from "./components/MapBoxGLMap/style.json";
 
-import "./App.css";
-
 class App extends Component {
   componentDidMount() {
     this.props.store.loadBusLines();
