@@ -12,13 +12,6 @@ const importMapStyle = () =>
 @inject("store")
 @observer
 class App extends Component {
-  componentDidMount() {
-    this.props.store.markerStore.loadVehicleActivity();
-    setInterval(() => {
-      this.props.store.markerStore.loadVehicleActivity();
-    }, process.env.REACT_APP_BACKEND_POLL_INTERVAL_MS || 5000);
-  }
-
   render() {
     return (
       <div className="App">
@@ -38,7 +31,6 @@ class App extends Component {
             style: importMapStyle(),
             zoom: 12
           }}
-          markers={this.props.store.markers}
         />
       </div>
     );

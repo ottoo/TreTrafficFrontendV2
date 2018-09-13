@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Noto+Sans");
+@import "~antd/dist/antd.css";
 
 body {
   margin: 0;

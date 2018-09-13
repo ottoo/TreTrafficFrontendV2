@@ -1,4 +1,4 @@
-import { types } from "mobx-state-tree";
+import { types, getParent } from "mobx-state-tree";
 import axios from "axios";
 
 const Marker = types.model("Marker", {
@@ -16,11 +16,22 @@ export const MarkerStore = types
     setMarkers(markers) {
       self.markers = markers;
     },
+    /**
+     * Gets the selected bus lines from BusLineStore for the API call.
+     */
+    getSelectedBusLines() {
+      const selectedBusLines = getParent(self).selectedBusLines;
+      return selectedBusLines.join(",");
+    },
+    /**
+     * API call to load vehicle activity from the backend. Maps the received data into a more suitable
+     * format for markers.
+     */
     async loadVehicleActivity() {
       const response = await axios.get(
         `${
           process.env.REACT_APP_BACKEND_URL
-        }/api/vehicle-activity?lineRef=1,2,8,3`
+        }/api/vehicle-activity?lineRef=${self.getSelectedBusLines()}`
       );
       const convertBusLinesToMarkers = responseData =>
         responseData.map(r => ({

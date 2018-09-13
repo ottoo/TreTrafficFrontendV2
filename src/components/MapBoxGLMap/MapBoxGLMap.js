@@ -1,24 +1,12 @@
 import React, { Component } from "react";
 import mapboxgl from "mapbox-gl";
+import { observer, inject } from "mobx-react";
 
+import * as mapHelpers from "./helpers";
 import "../../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 import "./MapBoxGLMap.css";
-import { observer } from "mobx-react";
 
-const createCustomMarker = m => {
-  const lineRef = document.createElement("div");
-  lineRef.className = "lineref";
-  lineRef.textContent = m.lineRef;
-
-  const actual = document.createElement("div");
-  actual.className = "marker";
-  actual.appendChild(lineRef);
-
-  const markerContainer = document.createElement("div");
-  markerContainer.appendChild(actual);
-  return markerContainer;
-};
-
+@inject("store")
 @observer
 class MapBoxGLMap extends Component {
   static defaultProps = {
@@ -29,13 +17,20 @@ class MapBoxGLMap extends Component {
     super(props);
     this.state = {
       map: null,
-      mapboxglMarkers: []
+      mapboxGLMarkers: []
     };
   }
 
+  /**
+   * Add a mapbox-gl map to the dom and initialize polling of vehicle data.
+   */
   componentDidMount() {
-    const { addNavigationControl, mapOptions } = this.props;
+    this.addMap();
+    this.pollVehicleActivity();
+  }
 
+  addMap() {
+    const { addNavigationControl, mapOptions } = this.props;
     const map = new mapboxgl.Map(mapOptions);
 
     if (addNavigationControl === true) {
@@ -45,36 +40,85 @@ class MapBoxGLMap extends Component {
     this.setState({ map });
   }
 
-  addMarker(marker) {
+  async pollVehicleActivity() {
+    const { store } = this.props;
+
+    const loadVehiclesAndAddToMap = async () => {
+      this.removeInactiveMarkers();
+      await store.markerStore.loadVehicleActivity();
+      this.updateMarkers();
+    };
+
+    loadVehiclesAndAddToMap();
+
+    setInterval(
+      loadVehiclesAndAddToMap,
+      process.env.REACT_APP_BACKEND_POLL_INTERVAL_MS || 5000
+    );
+  }
+
+  /**
+   * Updates the markers on the map. Removes markers that are not selected by the user any longer.
+   * If bus line is new, add a new marker or if bus line already exists on the map, update the
+   * existing marker position.
+   */
+  updateMarkers() {
+    const { store } = this.props;
+    const { mapboxGLMarkers } = this.state;
+
     const findMarkerByVehicleRef = ref =>
-      this.state.mapboxglMarkers.find(m => m.vehicleRef === ref);
+      mapboxGLMarkers.find(m => m.vehicleRef === ref);
 
-    const found = findMarkerByVehicleRef(marker.vehicleRef);
+    const markers = store.markers.map(m => {
+      const found = findMarkerByVehicleRef(m.vehicleRef);
 
-    if (found) {
-      found.setLngLat([marker.lng, marker.lat]);
-    } else {
-      const created = new mapboxgl.Marker(createCustomMarker(marker), {
-        anchor: "center"
-      })
-        .setLngLat([marker.lng, marker.lat])
-        .addTo(this.state.map);
-      created.vehicleRef = marker.vehicleRef;
-      this.state.mapboxglMarkers.push(created);
+      if (found) {
+        return found.setLngLat([m.lng, m.lat]);
+      } else {
+        const created = mapHelpers.createMarker(m);
+
+        this.setState(prevState => ({
+          mapboxGLMarkers: [...prevState.mapboxGLMarkers, created]
+        }));
+        return created;
+      }
+    });
+
+    if (markers && markers.length > 0) {
+      markers.forEach(m => {
+        m.addTo(this.state.map);
+      });
     }
+  }
+
+  removeInactiveMarkers() {
+    const { store } = this.props;
+    const { mapboxGLMarkers } = this.state;
+    const selectedBusLines = store.selectedBusLines;
+
+    // Remove marker from the map and state
+    mapboxGLMarkers.forEach(m => {
+      if (selectedBusLines.includes(m.lineRef) === false) {
+        this.setState(
+          prevState => ({
+            mapboxGLMarkers: prevState.mapboxGLMarkers.filter(
+              mm => mm.lineRef !== m.lineRef
+            )
+          }),
+          () => {
+            m.remove();
+          }
+        );
+      }
+    });
   }
 
   render() {
     const {
       containerStyle,
-      markers,
       mapOptions: { container }
     } = this.props;
 
-    // Need to do this in render since mobx reacts only to observables referred in a render method.
-    markers.forEach(m => {
-      this.addMarker(m);
-    });
     return <div id={container} style={containerStyle} />;
   }
 }
