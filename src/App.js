@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 
 import MapBoxGLMap from "./components/MapBoxGLMap/MapBoxGLMap";
+import NavigationMenu from "./components/NavigationMenu/NavigationMenu";
 
 const importMapStyle = () =>
   process.env.NODE_ENV === "production"
@@ -21,10 +22,12 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <NavigationMenu />
+
         <MapBoxGLMap
           containerStyle={{
             position: "absolute",
-            top: 0,
+            top: 50,
             bottom: 0,
             width: "100%"
           }}

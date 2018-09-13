@@ -3,6 +3,7 @@ import mapboxgl from "mapbox-gl";
 
 import "../../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 import "./MapBoxGLMap.css";
+import { observer } from "mobx-react";
 
 const createCustomMarker = m => {
   const lineRef = document.createElement("div");
@@ -18,6 +19,7 @@ const createCustomMarker = m => {
   return markerContainer;
 };
 
+@observer
 class MapBoxGLMap extends Component {
   static defaultProps = {
     addNavigationControl: false
@@ -62,17 +64,17 @@ class MapBoxGLMap extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    nextProps.markers.forEach(m => {
-      this.addMarker(m);
-    });
-  }
-
   render() {
     const {
       containerStyle,
+      markers,
       mapOptions: { container }
     } = this.props;
+
+    // Need to do this in render since mobx reacts only to observables referred in a render method.
+    markers.forEach(m => {
+      this.addMarker(m);
+    });
     return <div id={container} style={containerStyle} />;
   }
 }
