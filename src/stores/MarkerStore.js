@@ -16,7 +16,7 @@ export const MarkerStore = types
     setMarkers(markers) {
       self.markers = markers;
     },
-    async loadBusLines() {
+    async loadVehicleActivity() {
       const response = await axios.get(
         `${
           process.env.REACT_APP_BACKEND_URL

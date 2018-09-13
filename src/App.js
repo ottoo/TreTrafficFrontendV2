@@ -12,9 +12,9 @@ const importMapStyle = () =>
 @observer
 class App extends Component {
   componentDidMount() {
-    this.props.store.loadBusLines();
+    this.props.store.markerStore.loadVehicleActivity();
     setInterval(() => {
-      this.props.store.loadBusLines();
+      this.props.store.markerStore.loadVehicleActivity();
     }, process.env.REACT_APP_BACKEND_POLL_INTERVAL_MS || 5000);
   }
 
@@ -35,7 +35,7 @@ class App extends Component {
             style: importMapStyle(),
             zoom: 12
           }}
-          markers={this.props.store.markers.toJS()}
+          markers={this.props.store.markers}
         />
       </div>
     );
