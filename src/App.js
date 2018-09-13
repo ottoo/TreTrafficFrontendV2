@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import * as R from "ramda";
 
 import MapBoxGLMap from "./components/MapBoxGLMap/MapBoxGLMap";
 
@@ -9,6 +8,8 @@ const importMapStyle = () =>
     ? require("./components/MapBoxGLMap/style_prod.json")
     : require("./components/MapBoxGLMap/style_dev.json");
 
+@inject("store")
+@observer
 class App extends Component {
   componentDidMount() {
     this.props.store.loadBusLines();
@@ -41,9 +42,4 @@ class App extends Component {
   }
 }
 
-const enhance = R.compose(
-  inject("store"),
-  observer
-);
-
-export default enhance(App);
+export default App;
