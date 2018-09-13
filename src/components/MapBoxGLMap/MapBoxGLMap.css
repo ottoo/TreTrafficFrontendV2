@@ -1,0 +1,20 @@
+.marker {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: #89849b;
+  border: 1px solid #4a4a4a;
+  transform: rotate(-45deg);
+  margin: -20px 0 0 -20px;
+}
+
+div.lineref {
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  color: #fff;
+  margin: 8px 0 0 8px;
+  position: absolute;
+  transform: rotate(45deg);
+  text-align: center;
+}
