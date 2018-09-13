@@ -18,7 +18,9 @@ export const MarkerStore = types
     },
     async loadBusLines() {
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/lines?lineRefs=1,2,8,3`
+        `${
+          process.env.REACT_APP_BACKEND_URL
+        }/api/vehicle-activity?lineRef=1,2,8,3`
       );
       const convertBusLinesToMarkers = responseData =>
         responseData.map(r => ({
