@@ -1,5 +1,4 @@
 import { types, getParent } from "mobx-state-tree";
-import axios from "axios";
 
 const Marker = types.model("Marker", {
   lat: types.number,
@@ -12,6 +11,11 @@ export const MarkerStore = types
   .model("MarkerStore", {
     markers: types.array(Marker)
   })
+  .views(self => ({
+    get root() {
+      return getParent(self);
+    }
+  }))
   .actions(self => ({
     setMarkers(markers) {
       self.markers = markers;
@@ -28,7 +32,7 @@ export const MarkerStore = types
      * format for markers.
      */
     async loadVehicleActivity() {
-      const response = await axios.get(
+      const response = await self.root.api.get(
         `${
           process.env.REACT_APP_BACKEND_URL
         }/api/vehicle-activity?lineRef=${self.getSelectedBusLines()}`

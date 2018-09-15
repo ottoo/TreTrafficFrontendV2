@@ -1,4 +1,4 @@
-import { types } from "mobx-state-tree";
+import { getEnv, types } from "mobx-state-tree";
 
 import { BusLineStore } from "./BusLineStore";
 import { MarkerStore } from "./MarkerStore";
@@ -12,6 +12,10 @@ export const RootStore = types
     markerStore: types.optional(MarkerStore, { markers: [] })
   })
   .views(self => ({
+    // Shortcut to get the used api
+    get api() {
+      return getEnv(self).api;
+    },
     // Shortcut to get bus lines
     get busLines() {
       return self.busLineStore.busLines;

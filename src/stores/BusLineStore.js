@@ -1,5 +1,4 @@
-import { types } from "mobx-state-tree";
-import axios from "axios";
+import { getParent, types } from "mobx-state-tree";
 
 const BusLine = types.model("BusLine", {
   name: types.string,
@@ -11,6 +10,11 @@ export const BusLineStore = types
     busLines: types.array(BusLine),
     selectedBusLines: types.array(types.string)
   })
+  .views(self => ({
+    get root() {
+      return getParent(self);
+    }
+  }))
   .actions(self => ({
     setBusLines(busLines) {
       self.busLines = busLines;
@@ -33,7 +37,7 @@ export const BusLineStore = types
      * Load available bus lines from the backend.
      */
     async loadBusLines() {
-      const response = await axios.get(
+      const response = await self.root.api.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/lines`
       );
       self.setBusLines(response.data);
