@@ -44,6 +44,9 @@ export const MarkerStore = types
           lineRef: r.lineRef,
           vehicleRef: r.vehicleRef
         }));
-      self.setMarkers(convertBusLinesToMarkers(response.data));
+
+      if (response && response.data) {
+        self.setMarkers(convertBusLinesToMarkers(response.data));
+      }
     }
   }));
