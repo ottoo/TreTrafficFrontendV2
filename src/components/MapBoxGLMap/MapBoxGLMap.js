@@ -25,6 +25,7 @@ class MapBoxGLMap extends Component {
    * Add a mapbox-gl map to the dom and initialize polling of vehicle data.
    */
   componentDidMount() {
+    this.props.store.busLineStore.loadBusLines();
     this.addMap();
     this.pollVehicleActivity();
   }

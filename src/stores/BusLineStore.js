@@ -40,9 +40,9 @@ export const BusLineStore = types
       const response = await self.root.api.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/lines`
       );
-      self.setBusLines(response.data);
-    },
-    afterCreate() {
-      self.loadBusLines();
+
+      if (response && response.data) {
+        self.setBusLines(response.data);
+      }
     }
   }));
