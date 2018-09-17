@@ -1,4 +1,5 @@
-import { getParent, types } from "mobx-state-tree";
+import { getParent, types, getSnapshot, onSnapshot } from "mobx-state-tree";
+import * as R from "ramda";
 
 const BusLine = types.model("BusLine", {
   name: types.string,
@@ -44,5 +45,24 @@ export const BusLineStore = types
       if (response && response.data) {
         self.setBusLines(response.data);
       }
+    },
+    /**
+     * Save changed selected bus lines to
+     * localStorage on every snapshot.
+     */
+    afterCreate() {
+      onSnapshot(self, store => {
+        const selectedBusLines = store.selectedBusLines;
+        const currentLocalStorageBusLines = localStorage.getItem(
+          "selectedBusLines"
+        );
+
+        if (!R.equals(currentLocalStorageBusLines, selectedBusLines)) {
+          localStorage.setItem(
+            "selectedBusLines",
+            JSON.stringify(selectedBusLines)
+          );
+        }
+      });
     }
   }));

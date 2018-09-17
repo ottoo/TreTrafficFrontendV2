@@ -3,11 +3,15 @@ import { getEnv, types } from "mobx-state-tree";
 import { BusLineStore } from "./BusLineStore";
 import { MarkerStore } from "./MarkerStore";
 
+const initialBusLines = ["2", "3", "8", "9", "17"];
+const getInitialBusLines = () =>
+  JSON.parse(localStorage.getItem("selectedBusLines")) || initialBusLines;
+
 export const RootStore = types
   .model("RootStore", {
     busLineStore: types.optional(BusLineStore, {
       busLines: [],
-      selectedBusLines: ["2", "3", "8", "9", "17"]
+      selectedBusLines: getInitialBusLines()
     }),
     markerStore: types.optional(MarkerStore, { markers: [] })
   })
